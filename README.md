@@ -12,11 +12,13 @@ Algorithms:
 - [ ] Stochastic Gradient Descent
 - [ ] BFGS 
 - [ ] Nelder Mead
+
 Opportunities to parallelise?
 Crossover with sampling algorithms?
 
 ## Algorithms Designed for Parallel
 - [ ] Particle Swarm 
+- [ ] Ant/Bee Colony
 - [ ] Genetic/Evolutionary Algorithms
 - [ ] Work of Lelievre? -- parallel replica algorithm (possibly for metastable particle systems rather than optimisation)
 
