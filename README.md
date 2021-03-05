@@ -17,7 +17,7 @@ Opportunities to parallelise?
 Crossover with sampling algorithms?
 
 ## Algorithms Designed for Parallel
-- [ ] Particle Swarm 
+- [ ] Particle Swarm -- better to hunt as a swarm or packs (i.e. local or global interaction?
 - [ ] Ant/Bee Colony
 - [ ] Genetic/Evolutionary Algorithms
 - [ ] Work of Lelievre? -- parallel replica algorithm (possibly for metastable particle systems rather than optimisation)
