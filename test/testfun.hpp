@@ -81,7 +81,7 @@ public:
     }
     Eigen::VectorXd gradient(const Eigen::VectorXd& x)
     {
-        // 4x^3 - 2x^2 - 2x
+        // 4x^3 - 3x^2 - 2x
         return 4*x.array().pow(3) - 3*x.array().square() - 2*x.array();
     }
 };
