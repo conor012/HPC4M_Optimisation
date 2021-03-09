@@ -104,7 +104,7 @@ They should return a vector `step` that is the point at which the minimum of the
 ### C++ Software Structure 
 
 - [x]  Use of Eigen or Armadillo?
-- [ ] Intel MKL for distributed linear algebra  
+- [x] ~~Intel MKL for distributed linear algebra~~ We aren't working with large enough dimensions to make this worthwhile
 
 ### Basic Algorithms
 
