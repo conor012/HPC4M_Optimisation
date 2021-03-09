@@ -4,8 +4,8 @@
 
 // Use template to allow any type to be passed to gd
 template<typename ObjFunc>
-Eigen::VectorXd gd(ObjFunc f, const int max_iter, Eigen::VectorXd int_val, double rel_sol_change_tol,
-                double grad_change_tol, double gam){
+Eigen::VectorXd gd(ObjFunc f, const int max_iter, const Eigen::VectorXd& int_val, const double rel_sol_change_tol,
+                const double grad_change_tol, const double gam){
      // Learning rate is fixed value at the moment. Could change this?
     // Intialise the step, which will be x_i and step_prev which will be x_{i-1} at...
     //.. each step of the gd algorithm
@@ -34,9 +34,9 @@ Eigen::VectorXd gd(ObjFunc f, const int max_iter, Eigen::VectorXd int_val, doubl
     while(iter < max_iter && rel_sol_change > rel_sol_change_tol && grad_change > grad_change_tol){
         df = f.gradient(step_prev);                                                     // Calculate \nabla F(x_{i-1})...
         step = step_prev - gam*df;
-        rel_sol_change = abs(f.evaluate(step_prev) - f.evaluate(step));    // The relative change in solution x_i and x_{i-1}
+        rel_sol_change = abs(f.evaluate(step_prev) - f.evaluate(step)/f.evaluate(step));    // The relative change in solution x_i and x_{i-1}
         // L2 norm of change in gradient from solution x_{i-1} to x_i
-        grad_change =  (df - df_prev).norm() ;
+        grad_change =  ((df - df_prev).norm())/df.norm() ;
         // Then update the steps (x_i's) and gradients (df's) for the next iteration.
         // std::cout<< " Current Step is :" << step << std::endl;
         step_prev = step;
