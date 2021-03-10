@@ -4,12 +4,15 @@
 #include <fstream>
 #include "../test/testfun.hpp"
 #include <Eigen/Dense>
+#include <iomanip>
+#include "../testfun.hpp"
 
 using namespace std;
 
 template<typename ObjFunc> // Use the parameter 'max_bound' to define edge of hypercube to optimse in
 Eigen::VectorXd bfgs(ObjFunc f, const int max_iter, const Eigen::VectorXd& int_val,
   const double rel_sol_change_tol, const double grad_nrm_tol, const double gam,
+  const double rel_sol_change_tol, const double grad_nrm_tol, double gam,
    const double max_bound){
     // Initialise vectors to hold xk, xk+1 and print initial value.
     Eigen::VectorXd step_prev = int_val, step;
@@ -20,6 +23,7 @@ Eigen::VectorXd bfgs(ObjFunc f, const int max_iter, const Eigen::VectorXd& int_v
 
     // Useful constants for updates
     double st_q, qt_d_q;
+    double st_q, qt_D_q;
 
     // Initialise relative changes to large number
     double rel_sol_change = 2*rel_sol_change_tol;
@@ -27,6 +31,7 @@ Eigen::VectorXd bfgs(ObjFunc f, const int max_iter, const Eigen::VectorXd& int_v
 
     // Initialise matrix D as the identity matrix
     Eigen::MatrixXd d = Eigen::MatrixXd::Identity(dim, dim);
+    Eigen::MatrixXd D = Eigen::MatrixXd::Identity(dim, dim);
 
     int iter = 0;  // Initial no. iterations
 
@@ -39,6 +44,19 @@ Eigen::VectorXd bfgs(ObjFunc f, const int max_iter, const Eigen::VectorXd& int_v
       // Update step
       step = step_prev - gam*d*df_prev;
 
+    grad_nrm = df_prev.norm();
+    // While max iteraitons has not been reached and all change tolerances have
+    // not been met, perform bfgs update
+    Eigen::VectorXd p(dim);
+    const double c =1e-4, tau = 0.95;
+    while (iter < max_iter && rel_sol_change > rel_sol_change_tol && grad_nrm > grad_nrm_tol){
+      // Update step
+      p= -D*df_prev;
+      gam = 2;
+      while(f.evaluate(step_prev + gam*p) > (f.evaluate(step_prev) + gam*c*p.transpose()*df_prev)){
+        gam *= tau;
+      }
+      step = step_prev + gam*p;
       // Project iteration back into hypercube if needed
       for (int i=0; i<dim; ++i){
         if (step(i) < -max_bound){step(i) = -max_bound;}
@@ -59,6 +77,9 @@ Eigen::VectorXd bfgs(ObjFunc f, const int max_iter, const Eigen::VectorXd& int_v
       qt_d_q = abs(q.transpose()*d*q); // Small values may cause erratic negative values
       w = sqrt(qt_d_q)*(s/st_q - d*q/qt_d_q);
       d += s*s.transpose()/st_q - d*q*q.transpose()*d/qt_d_q + w*w.transpose();
+      qt_D_q = abs(q.transpose()*D*q); // Small values may cause erratic negative values
+      w = sqrt(qt_D_q)*(s/st_q - D*q/qt_D_q);
+      D += s*s.transpose()/st_q - D*q*q.transpose()*D/qt_D_q + w*w.transpose();
       // Update iterate values
       step_prev = step;
       df_prev = df;
