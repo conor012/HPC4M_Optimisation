@@ -44,16 +44,16 @@ std::ostream& operator<<(std::ostream& os, const Result& res) {
 
 class BaseOptimiser{
 public:
-  Result res;
+  BaseOptimiser(ObjectiveFunction& f,const Eigen::VectorXd& int_val, const OptimiserSettings settings){};
+  Eigen::VectorXd step = int_val;
+  const int dim = int_val.size();
+  Eigen::VectorXd df(dim);
+
+  int iter = 0;
   Result minimise(ObjectiveFunction& f, const Eigen::VectorXd& int_val, const OptimiserSettings settings){
     Result res;
-    Eigen::VectorXd step = int_val;
-    const int dim = int_val.size();
-    Eigen::VectorXd df(dim);
     res.rel_sol_change = 2*settings.rel_sol_change_tol;
     res.grad_norm = 2*settings.grad_norm_tol;
-
-    int iter = 0;
     df = f.gradient(step);
     // Save data
     auto t = std::time(nullptr);
@@ -63,6 +63,7 @@ public:
     auto date = oss.str();
     if(settings.save){std::cout << "trajectory"+date+".csv" << std::endl;}
     std::ofstream trajectory("trajectory" + date + ".csv");
+
 
     while (res.iterations < settings.max_iter &&
            res.rel_sol_change > settings.rel_sol_change_tol &&
@@ -99,6 +100,54 @@ public:
   }
 };
 
+// class BFGS: public BaseOptimiser{
+// public:
+//   //BFGS Declarations
+//   Eigen::VectorXd next_step = step;
+//   Eigen::VectorXd next_df(dim), s(dim), q(dim), w(dim);
+//   Eigen::MatrixXd D = Eigen::MatrixXd::Identity(dim, dim);
+//   double st_q, qt_D_q;
+//   Eigen::VectorXd p(dim);
+//   const double c =1e-4, tau = 0.95;
+//
+//   Eigen::VectorXd update(ObjectiveFunction& f, const Eigen::VectorXd& step,
+//     const OptimiserSettings& settings, Result& res)
+//   {
+//     // Update step
+//     p= -D*df;
+//     settings.gam = 2;
+//     while(f.evaluate(step + gam*p) > (f.evaluate(step) + gam*c*p.transpose()*df)){
+//       settings.gam *= tau;
+//     }
+//     next_step = step + settings.gam*p;
+//     // Project iteration back into hypercube if needed
+//     // for (int i=0; i<dim; ++i){
+//     //   if (step(i) < -max_bound){step(i) = -max_bound;}
+//     //   else if (step(i)>max_bound){step(i)=max_bound;}
+//     // }
+//
+//     // Compute new gradient and relative changes
+//     next_df = f.gradient(next_step);
+//     res.rel_sol_change = abs((f.evaluate(step) - f.evaluate(next_step))/f.evaluate(step));
+//     res.grad_norm = next_df.norm();
+//
+//     // Compute difference between points and gradients at k and k+1.
+//     s = next_step - step;
+//     q = next_df - df;
+//
+//     // Update the matrix d
+//     st_q = s.transpose()*q;
+//     qt_D_q = abs(q.transpose()*D*q); // Small values may cause erratic negative values
+//     w = sqrt(qt_D_q)*(s/st_q - D*q/qt_D_q);
+//     D += s*s.transpose()/st_q - D*q*q.transpose()*D/qt_D_q + w*w.transpose();
+//     // Update iterate values
+//     step = next_step;
+//     df = next_df;
+//     ++res.iterations;
+//     return step;
+//   }
+// };
+
 int main(){
   OptimiserSettings settings;
   Result res;
@@ -117,7 +166,7 @@ int main(){
   // Set intial values. This could be anything.
   int_vals << 4,3;
   // Use the gradient descent algorithm to calculate the minimum.
-  GradientDescent gd;
+  GradientDescent gd(f,int_vals, settings);
   res = gd.minimise(f, int_vals, settings);
 
   std::cout << res  << std::endl;
