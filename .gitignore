@@ -1,2 +1,4 @@
 eigen-3.3.9/*
 *.exe
+.DS_Store
+*.csv
