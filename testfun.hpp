@@ -55,6 +55,7 @@ public:
 };
 
 // 1 dimension double well, overloads with exact gradient. Global min x = +-1/sqrt(2)
+// 1 dimension double well, overloads with exact gradient. Global min x = +-1/sqrt(2)~0.70711
 class DoubleWell1D: public BaseObjective{
 public:
     DoubleWell1D(const int d){assert(d==1 && "Only well-defined for 1 dimension");}
@@ -71,6 +72,7 @@ public:
 };
 
 // Double well with two minima, global min at x = (3+sqrt(41))/8 ~ 1.1754
+// Double well with two minima, global min at x = (3+sqrt(41))/8 ~ 1.17539
 class UnevenDoubleWell1D: public BaseObjective{
 public:
     UnevenDoubleWell1D(const int d){assert(d==1 && "Only well-defined for 1 dimension");}
@@ -87,6 +89,7 @@ public:
 };
 
 // Eggholder function, unknown global minimum
+// Eggholder function, global minimum at x = (512,404.2319)
 class Eggholder: public BaseObjective{
 public:
     Eggholder(const int d){assert(d==2 && "Eggholder only defined for d==2");}
@@ -98,12 +101,15 @@ public:
 
 // Shekel function
 // Needs restricting to  [-10,10] where minimum is at 4,4,4,4
+// Needs restricting to  [-10,10] where minimum is at (4,4,4,4)
 // Something is incorrect in the implementation
 class Shekel: public BaseObjective{
 public:
     Shekel(const int d){assert(d==4 && "Shekel only defined for d==4");}
+
     double evaluate(const Eigen::VectorXd& x)
     {
+        int m = 10;
         Eigen::MatrixXd C(4,10);
         Eigen::MatrixXd  beta(10,1);
         C <<  4, 1, 8, 6, 3, 2, 5, 8, 6, 7,
@@ -112,21 +118,19 @@ public:
               4 ,1, 8, 6, 7, 9, 3, 1, 2, 3.6;
         beta << 1, 2, 2, 4, 4, 6, 3, 7, 5, 5;
         beta /= 10;
-        double val = 0;
-        double buffer = 0;
-        for(int i=0; i<x.size();++i)
+        double outer = 0;
+        for(int i=0; i<m;++i)
         {
+            double inner = 0;
             for(int j=0; j<4;++j)
             {
-                buffer += (pow((x(j) - C(j,i)),2));
+                inner += (pow((x(j) - C(j,i)),2));
             }
-            buffer += beta(i);
-            buffer = 1/buffer;
-            val += buffer;
-            buffer = 0;
+            outer += 1/(inner+ beta(i));
+
         }
-        val = -val;
-        return val;
+        outer = -outer;
+        return outer;
     }
 };
 
