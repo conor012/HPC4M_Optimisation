@@ -44,10 +44,7 @@ public:
         // Update step
         next_step = step + gamma*p;
         // Project iteration back into hypercube if needed
-        for (int i=0; i<dim; ++i){
-          if (next_step(i) < -max_bound){next_step(i) = -max_bound;}
-          else if (next_step(i)>max_bound){next_step(i)=max_bound;}
-        }
+        next_step = check_bounds(next_step, settings);
 
         // Compute new gradient and relative changes
         next_df = f.gradient(next_step);
@@ -64,7 +61,7 @@ public:
         w = sqrt(qt_D_q)*(s/st_q - D*q/qt_D_q);
         D += s*s.transpose()/st_q - D*q*q.transpose()*D/qt_D_q + w*w.transpose();
         // Update iterate values
-        // step = next_step;
+        step = next_step;
         df = next_df;
         res.iterations++;
       }
