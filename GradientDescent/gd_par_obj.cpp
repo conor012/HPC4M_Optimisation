@@ -1,5 +1,5 @@
 #include "HPC_Opt.hpp"
-#include<"mpi.h">
+#include <mpi.h>
 int main()
 {
     int rank;
@@ -64,7 +64,9 @@ int main()
             }
         }
         std::cout << settings << std::endl;
-         std::cout << res  << std::endl;
+        std::cout<<  "\nthe minimiser is:\n" << min_val;
+        std::cout << "\nThe objective value at this point is " <<std::endl
+                            << f.evaluate(min_val) << std::endl;
     }
 
     MPI_Finalize();
