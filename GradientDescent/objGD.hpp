@@ -67,14 +67,5 @@ private:
        res.iterations++;
        return next_step;
      }
-   Eigen::VectorXd check_bounds(Eigen::VectorXd& step, const GDSettings& settings)
-   {
-     for (int i=0; i<step.size(); ++i)
-     {
-       if (step(i) < settings.min_bound){step(i) = settings.min_bound;}
-       else if (step(i)>settings.max_bound){step(i)= settings.max_bound;}
-     }
-     return step;
-   }
 };
 #endif

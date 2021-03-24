@@ -28,7 +28,6 @@ std::ostream& operator<<(std::ostream& os, const OptimiserSettings& settings)
   return os << "Max Iterations: " << settings.max_iter << std::endl
             << "Relative Solution Change Tolerance: " << settings.rel_sol_change_tol << std::endl
             << "Norm of Gradient Tolerance: " << settings.grad_norm_tol << std::endl
-            << "Step size: " << settings.gamma << std::endl
             << "Save data? " << (settings.save ? "Yes" : "No") << std::endl
             << "Restricted to the hypercube [" << settings.min_bound << "," << settings.max_bound << "]";
 
@@ -61,6 +60,15 @@ public:
     << filename.append(date + ".csv") << std::endl;
     p_filename = filename.c_str() ;
     trajectory.open(p_filename);
+  }
+  Eigen::VectorXd check_bounds(Eigen::VectorXd& step, const OptimiserSettings& settings)
+  {
+    for (int i=0; i<step.size(); ++i)
+    {
+      if (step(i) < settings.min_bound){step(i) = settings.min_bound;}
+      else if (step(i)>settings.max_bound){step(i)= settings.max_bound;}
+    }
+    return step;
   }
 
 
