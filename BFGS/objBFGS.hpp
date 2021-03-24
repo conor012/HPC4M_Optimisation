@@ -51,7 +51,6 @@ public:
         res.rel_sol_change = abs((f.evaluate(next_step) - f.evaluate(step))/f.evaluate(step));
         res.grad_norm = df.norm();
 
-
         // Update the matrix D
         // Compute difference between points and gradients at k and k+1.
         s = next_step - step;
