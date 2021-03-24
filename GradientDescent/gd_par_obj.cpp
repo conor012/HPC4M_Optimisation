@@ -42,12 +42,12 @@ int main()
     std::cout << int_vals << std::endl;
 
     // Use the gradient descent algorithm to calculate the minimum (comment max_bound if not needed).
-    GradientDescent gd
+    GradientDescent gd;
     Result res = gd.minimise(f, int_vals, settings);
 
     // All processors except the root send the min_val they have found to the root
     if(rank!=root){
-        MPI_Send(&res.minimum[0], d, MPI_DOUBLE, 0, 1, comm);
+        MPI_Send(&res.minimiser[0], d, MPI_DOUBLE, 0, 1, comm);
     }
 
     if(rank == root)
