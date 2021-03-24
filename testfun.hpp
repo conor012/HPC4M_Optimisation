@@ -1,7 +1,3 @@
-#include <iostream>
-#include <cmath>
-#include <Eigen/Dense>
-
 #ifndef TESTFUN
 #define TESTFUN
 
@@ -94,9 +90,7 @@ public:
 };
 
 // Shekel function
-// Needs restricting to  [-10,10] where minimum is at 4,4,4,4
 // Needs restricting to  [-10,10] where minimum is at (4,4,4,4)
-// Something is incorrect in the implementation
 class Shekel: public ObjectiveFunction{
 public:
     Shekel(const int d){assert(d==4 && "Shekel only defined for d==4");}
