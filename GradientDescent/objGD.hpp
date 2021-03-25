@@ -3,13 +3,13 @@
 
 std::map<std::string, int> gd_methods = {
   { "vanilla"  , 1 },
-  { "momentum" , 2 }
+  { "momentum" , 2 },
+  { "Nesterov accelerated gradient descent" , 3}
 };
 struct GDSettings: OptimiserSettings
 {
   //const int method {gd_methods["vanilla"]};
   int method {gd_methods["vanilla"]};
-  double par_momentum;
 };
 
 // Redefine insertion operator to include method name
@@ -17,7 +17,8 @@ std::ostream& operator<<(std::ostream& os, const GDSettings& settings)
 {
   std::map<int,std::string> reverse_gd_methods = {
     { 1, "vanilla" },
-    { 2, "momentum" }
+    { 2, "momentum" },
+    { 3, "Nesterov accelerated gradient descent"}
   };
   return os << "\nUsing method: " << reverse_gd_methods[settings.method] <<std::endl
             << "Max Iterations: " << settings.max_iter << std::endl
@@ -40,8 +41,10 @@ public:
     if(settings.save){create_save_file();}
 
     Eigen::VectorXd step = int_val;
-    Eigen::VectorXd direc(int_val.size());
+    Eigen::VectorXd direc(int_val.size()), adam_vec_v(int_val.size());
     direc.fill(0);
+    adam_vec_v.fill(0);
+    res.adam_vec_v = adam_vec_v;
     res.direc = direc;
 
     while (res.iterations < settings.max_iter &&
@@ -67,7 +70,7 @@ private:
       //Eigen::VectorXd direc =res.direc;
       Eigen::VectorXd df = f.gradient(step);
       // Update direction based on if settings.method = 1 (vanilla) or 2 (momentum)
-      res.direc = direc_update(step, settings, df, res.direc);
+      res.direc = direc_update(f,step, settings, df, res.direc, res.adam_vec_v);
       //Eigen::VectorXd direc_new = direc_update(step, settings, df, direc);
       Eigen::VectorXd next_step = step - res.direc;//settings.gamma*df;
        // The relative change in solution x_i and x_{i-1}
@@ -77,18 +80,10 @@ private:
        res.iterations++;
        return next_step;
      }
-   Eigen::VectorXd check_bounds(Eigen::VectorXd& step, const GDSettings& settings)
-   {
-     for (int i=0; i<step.size(); ++i)
-     {
-       if (step(i) < settings.min_bound){step(i) = settings.min_bound;}
-       else if (step(i)>settings.max_bound){step(i)= settings.max_bound;}
-     }
-     return step;
-   }
-   //Updates direction for momentum / vanilla
-   Eigen::VectorXd direc_update(const Eigen::VectorXd& step,
-     const GDSettings& settings, const Eigen::VectorXd& df, const Eigen::VectorXd&direc)
+   //Updates direction for momentum / vanilla / NAG
+   Eigen::VectorXd direc_update(ObjectiveFunction& f, const Eigen::VectorXd& step,
+     const GDSettings& settings, const Eigen::VectorXd& df, const Eigen::VectorXd&direc,
+     const Eigen::VectorXd& adam_vec_v)
      {
        Eigen::VectorXd direc_out;
        switch (settings.method)
@@ -105,6 +100,25 @@ private:
             direc_out = settings.par_momentum * direc + settings.gamma * df;
             break;
         }
+        case 3: // Nesterov accelerated gradient
+        {
+            Eigen::VectorXd NAG_grad( step.size() );
+            NAG_grad = f.gradient(step - settings.par_momentum * direc);
+            //direc_out = settings.gamma* (settings.par_momentum * direc + NAG_grad);
+            direc_out = settings.par_momentum * direc + settings.gamma * NAG_grad;
+            break;
+        }
+        //case 4: // AdaGrad
+        //{
+        //    int exponent;
+        //    std::fill_n(exponent, step.size(), 2);
+        //    adam_vec_v = step.array().pow(exponent).matrix();
+        //    //adam_vec_v += VectorXcd::Map((df.cwiseAbs2()).data(), (df.cwiseAbs2()).size());
+            //direc_out = OPTIM_MATOPS_ARRAY_DIV_ARRAY( settings.gamma * df, OPTIM_MATOPS_ARRAY_ADD_SCALAR(OPTIM_MATOPS_SQRT(adam_vec_v), settings.par_ada_norm_term) );
+        //    direc_out = ( settings.gamma * df) / (sqrt(adam_vec_v.cwiseSqrt()) + settings.par_ada_norm_term) );
+
+        //    break;
+        //}
      }
       return direc_out;
      }

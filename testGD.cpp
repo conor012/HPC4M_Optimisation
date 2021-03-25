@@ -9,15 +9,16 @@ int main(){
   settings.save = false;
   settings.min_bound = 0;
   settings.max_bound = 10;
-  settings.method = 2;
-  settings.par_momentum = 0.05;
+  settings.method = 3;
+  settings.par_momentum = 0.1;
+  settings.par_ada_norm_term = 1;
   std::cout << settings << std::endl;
   // Initialise vectors to hold the intial values (which need to be inputted)
   const int d = {4};
   Eigen::VectorXd int_vals(d);
   Shekel f(d);
   // Set intial values. This could be anything.
-  int_vals << 4.2 ,4.2,4.2,4.2;
+  int_vals << 3,5,3,5;
   // Use the gradient descent algorithm to calculate the minimum.
   GradientDescent gd;
   Result res = gd.minimise(f, int_vals, settings);

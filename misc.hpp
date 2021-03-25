@@ -4,6 +4,8 @@
 struct Result
 {
   Eigen::VectorXd minimiser ;
+  Eigen::VectorXd direc ;
+  Eigen::VectorXd adam_vec_v;
   double minimum {NAN} ;
   int iterations {0};
   double grad_norm {NAN};
@@ -20,6 +22,8 @@ struct OptimiserSettings
   bool save {false};
   double max_bound {INFINITY};
   double min_bound {-INFINITY};
+  double par_momentum;
+  double par_ada_norm_term;
   friend std::ostream& operator<<(std::ostream& os, const OptimiserSettings& settings);
 };
 
