@@ -25,6 +25,7 @@ public:
     // Initialise matrix D as the identity matrix
     Eigen::MatrixXd D = Eigen::MatrixXd::Identity(dim, dim);
     Eigen::VectorXd p(dim);
+    if(settings.save){create_save_file();}
 
     // Compute initial gradient
     df = f.gradient(step);
@@ -35,6 +36,7 @@ public:
            res.rel_sol_change > settings.rel_sol_change_tol &&
            res.grad_norm > settings.grad_norm_tol)
       {
+        Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "");
         p= -D*df;
         // Armijo condition
         double gamma = 2;
@@ -61,11 +63,16 @@ public:
         D += s*s.transpose()/st_q - D*q*q.transpose()*D/qt_D_q + w*w.transpose();
         // Update iterate values
         step = next_step;
+        if(settings.save)
+        {
+          trajectory << step.transpose().format(CommaInitFmt) << std::endl;
+        }
         df = next_df;
         res.iterations++;
       }
     res.minimiser = step;
     res.minimum = f.evaluate(step);
+    if(settings.save){trajectory.close();}
     return res;
   }
 };
