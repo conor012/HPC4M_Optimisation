@@ -1,9 +1,15 @@
+#include <iostream>
+#include <cmath>
+#include <Eigen/Dense>
+#include <chrono>
+#include <thread>
+
 #ifndef TESTFUN
 #define TESTFUN
 
 // Base Class for defining an objective function (from R^N to R) to be minimised.
 // SHOULD NOT BE USED DIRECTLY, only inherited by objective functions
-class ObjectiveFunction {
+class BaseObjective {
 public:
     // Approximates the gradient in each direction at a point x
     Eigen::VectorXd gradient(const Eigen::VectorXd& x)
@@ -25,12 +31,18 @@ public:
         }
         return grad;
     }
+private:
     // Needs to be declared here, but will be overloaded in any subclass
-    virtual double evaluate(const Eigen::VectorXd& x)=0;
+    virtual double evaluate(const Eigen::VectorXd& x)
+    {
+        std::cout<<"Evaluate Not Implemented";
+        std::terminate();
+        return 0;
+    };
 };
 
 // Quadratic function x^Tx, gradient implemented exactly. Global min at x=0
-class Quadratic: public ObjectiveFunction{
+class Quadratic: public BaseObjective{
 public:
     Quadratic(const int d){}
     double evaluate(const Eigen::VectorXd& x)
@@ -46,7 +58,7 @@ public:
 
 // 1 dimension double well, overloads with exact gradient. Global min x = +-1/sqrt(2)
 // 1 dimension double well, overloads with exact gradient. Global min x = +-1/sqrt(2)~0.70711
-class DoubleWell1D: public ObjectiveFunction{
+class DoubleWell1D: public BaseObjective{
 public:
     DoubleWell1D(const int d){assert(d==1 && "Only well-defined for 1 dimension");}
     double evaluate(const Eigen::VectorXd& x)
@@ -63,7 +75,7 @@ public:
 
 // Double well with two minima, global min at x = (3+sqrt(41))/8 ~ 1.1754
 // Double well with two minima, global min at x = (3+sqrt(41))/8 ~ 1.17539
-class UnevenDoubleWell1D: public ObjectiveFunction{
+class UnevenDoubleWell1D: public BaseObjective{
 public:
     UnevenDoubleWell1D(const int d){assert(d==1 && "Only well-defined for 1 dimension");}
     double evaluate(const Eigen::VectorXd& x)
@@ -80,18 +92,21 @@ public:
 
 // Eggholder function, unknown global minimum
 // Eggholder function, global minimum at x = (512,404.2319)
-class Eggholder: public ObjectiveFunction{
+class Eggholder: public BaseObjective{
 public:
     Eggholder(const int d){assert(d==2 && "Eggholder only defined for d==2");}
     double evaluate(const Eigen::VectorXd& x)
     {
+        // std::this_thread::sleep_for (std::chrono::microseconds(1));  // Uncomment to add time restriction to code
         return -(x(1)+47)*sin(sqrt(abs((x(0)/2) + x(1)+47))) - x(0)*sin(sqrt(abs(x(0) - x(1) - 47)));
     }
 };
 
 // Shekel function
+// Needs restricting to  [-10,10] where minimum is at 4,4,4,4
 // Needs restricting to  [-10,10] where minimum is at (4,4,4,4)
-class Shekel: public ObjectiveFunction{
+// Something is incorrect in the implementation
+class Shekel: public BaseObjective{
 public:
     Shekel(const int d){assert(d==4 && "Shekel only defined for d==4");}
 
