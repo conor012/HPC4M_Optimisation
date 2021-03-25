@@ -3,8 +3,7 @@
 #include<Eigen/Dense>
 
 // Use template to allow any type to be passed to gd
-template<typename ObjFunc>
-Eigen::VectorXd gd(ObjFunc f, const int max_iter, const Eigen::VectorXd& int_val, const double rel_sol_change_tol,
+Eigen::VectorXd gd(ObjectiveFunction& f, const int max_iter, const Eigen::VectorXd& int_val, const double rel_sol_change_tol,
                 const double grad_change_tol, const double gam){
      // Learning rate is fixed value at the moment. Could change this?
     // Intialise the step, which will be x_i and step_prev which will be x_{i-1} at...
@@ -36,7 +35,7 @@ Eigen::VectorXd gd(ObjFunc f, const int max_iter, const Eigen::VectorXd& int_val
         step = step_prev - gam*df;
         rel_sol_change = abs(f.evaluate(step_prev) - f.evaluate(step)/f.evaluate(step));    // The relative change in solution x_i and x_{i-1}
         // L2 norm of change in gradient from solution x_{i-1} to x_i
-        grad_change =  ((df - df_prev).norm())/df.norm() ;
+        grad_change =  df.norm();
         // Then update the steps (x_i's) and gradients (df's) for the next iteration.
         // std::cout<< " Current Step is :" << step << std::endl;
         step_prev = step;
@@ -50,10 +49,10 @@ Eigen::VectorXd gd(ObjFunc f, const int max_iter, const Eigen::VectorXd& int_val
 int main()
 {
     const int d = {4};
-    double gam = 0.0001; // Set the learning rate
+    double gam = 0.001; // Set the learning rate
     int n_iter = 100000; // Set the maximum number of iterations
-    double grad_change_tol = pow(10,-10); // Set the tolerance for change of gradient
-    double rel_sol_change_tol = pow(10,-10); // Set the tolerance for change of solution
+    double grad_change_tol = pow(10,-6); // Set the tolerance for change of gradient
+    double rel_sol_change_tol = pow(10,-6); // Set the tolerance for change of solution
     // Initialise vectors to hold the minimum value to be found and the intial values (which need to be inputed)
     Eigen::VectorXd min_val(d);
     Eigen::VectorXd int_vals(d);
@@ -68,8 +67,8 @@ int main()
      grad_change_tol << "\nand a change in relative solution tolerance of " <<
      rel_sol_change_tol << "\nthe minimiser is:\n" << min_val;
 
-    std::cout << "\nThe objective value at this point is "
-                        << f.evaluate(min_val) << std::endl;
+    std::cout << "\nThe objective value at this point is " <<
+                         f.evaluate(min_val) << std::endl;
     return 0;
 
 }
