@@ -1,5 +1,6 @@
 #ifndef GD
 #define GD
+# include "mpi.h"
 
 std::map<std::string, int> gd_methods = {
   { "vanilla"  , 1 },
@@ -31,9 +32,10 @@ std::ostream& operator<<(std::ostream& os, const GDSettings& settings)
 
 class GradientDescent: public BaseOptimiser{
 public:
-  Result minimise(ObjectiveFunction& f, const Eigen::VectorXd& int_val, const GDSettings settings){
+  Result minimise(ObjectiveFunction& f, const Eigen::VectorXd& int_val, const GDSettings settings)
+  {
     Result res;
-    
+
     res.rel_sol_change = 2*settings.rel_sol_change_tol;
     res.grad_norm = 2*settings.grad_norm_tol;
     // Configure output format for vectors
@@ -63,6 +65,68 @@ public:
     if(settings.save){trajectory.close();}
     return res;
   }
+  Eigen::VectorXd parallel_minimise(ObjectiveFunction& f, const GDSettings settings)
+  {
+    int rank;
+    int size;
+    const int root = 0;
+    MPI_Status status;
+
+    MPI_Init(NULL, NULL);
+    MPI_Comm comm = MPI_COMM_WORLD;
+
+    MPI_Comm_size(comm, &size);
+    if(size < 2){
+        std::cout << "Error: Need at least 2 processes!" << std::endl;
+        MPI_Finalize();
+        std::terminate();
+    }
+    MPI_Comm_rank(comm, &rank);
+    const int d = 2;
+    // Initialise vectors to hold the minimum value to be found and the intial values (which need to be inputed)
+    Eigen::VectorXd min_val(d);
+    Eigen::VectorXd int_val(d);
+    // Set intial values. At the moment this selects them randomly but that could be changed.
+    // Seed the time differently for each process
+    unsigned seed = time(0) + rank;
+    // Seed the random number generator.
+    srand(seed);
+    // Fill intial values with random integers in domain
+    int_val = settings.max_bound * Eigen::VectorXd::Random(d);
+
+    // Use the gradient descent algorithm to calculate the minimum (comment max_bound if not needed).
+    GradientDescent gd;
+    Result res = gd.minimise(f, int_val, settings);
+
+    // All processors except the root send the min_val they have found to the root
+    if(rank!=root){
+        MPI_Send(&res.minimiser[0], d, MPI_DOUBLE, 0, 1, comm);
+    }
+
+    if(rank == root)
+    {
+        Eigen::VectorXd buffer(d); // buffer to hold incoming min_vals
+        // Root process receives min_vals in any order (this should make the code faster)...
+        for(int i=1; i < size; i++)
+        {
+            MPI_Recv(&buffer[0], d, MPI_DOUBLE, MPI_ANY_SOURCE, 1, comm, MPI_STATUS_IGNORE);
+            // ... it then evalutes the min_val recieved from each other process...
+            if(f.evaluate(buffer) < f.evaluate(min_val))
+            {
+                    min_val = buffer;                         // .. and keeps it only if it evaluates to a lower value than the current min_val.
+            }
+        }
+        std::cout << settings << std::endl;
+        std::cout<<  "\nthe minimiser is:\n" << min_val;
+        std::cout << "\nThe objective value at this point is " <<std::endl
+                            << f.evaluate(min_val) << std::endl;
+    }
+
+    MPI_Finalize();
+
+    return min_val;
+  }
+
 private:
     Eigen::VectorXd update(ObjectiveFunction& f, const Eigen::VectorXd& step,
      const GDSettings& settings, Result& res)
