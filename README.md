@@ -115,6 +115,7 @@ The standard settings are
 -  `dim` the dimension of the objective function (int)
 
 
+For a deeper dive into the theory and some scaling analysis, see `FinalReport.pdf`.
 
 
 ## Future Work
