@@ -1,3 +1,7 @@
+/* MISC.HPP
+Implementation of BaseOptimiser, Result and OptimiserSettings classes to be inherited by
+all optimisers.
+*/
 #ifndef MISC
 #define MISC
 

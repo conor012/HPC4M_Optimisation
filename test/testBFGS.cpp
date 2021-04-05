@@ -1,4 +1,10 @@
-#include "HPC_Opt.hpp"
+/* TESTBFGS.CPP
+Example usage of BFGS algorithm to optimise a function.
+For implementation of BFGS see BFGS.hpp
+See also:
+  - test/testParPSO.cpp for a parallel usage
+*/
+#include "../HPC_Opt.hpp"
 
 int main(){
   BFGSSettings settings;

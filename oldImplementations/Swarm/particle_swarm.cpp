@@ -11,7 +11,6 @@
 using namespace std;
 
 
-
 template<typename ObjFunc>
 Eigen::VectorXd particle_swarm(ObjFunc f, const int num_particles,
   const double gamma, const int dim, const double min_bound, const double max_bound,
@@ -39,7 +38,7 @@ Eigen::VectorXd particle_swarm(ObjFunc f, const int num_particles,
     file2.open("global_best.txt");
     // Loop over all iterations
     for (int m=0; m<exit_bound; ++m){
-
+      std::cout << m << "\n";
       for (int n=0; n<num_particles; ++n){
         position[n] += velocity[n]; // Update position of particle n
 
