@@ -1,3 +1,8 @@
+/* TESTGRIDSEARCH.CPP
+Example usage ofa naive grid search to find the minimum
+For implementation of GridSearch see GridSearch.hpp
+
+*/
 #include "../HPC_Opt.hpp"
 
 int main(){
