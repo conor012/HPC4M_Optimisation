@@ -1,6 +1,5 @@
 #ifndef GD
 #define GD
-# include "mpi.h"
 
 std::map<std::string, int> gd_methods = {
   { "vanilla"  , 1 },
