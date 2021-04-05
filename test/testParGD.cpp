@@ -1,3 +1,9 @@
+/* TESTPARGD.CPP
+Example usage of the parallel Gradient Descent algorithm to optimise a function.
+For implementation of GD see GD.hpp
+See also:
+  - test/testGD.cpp for a serial example
+*/
 #include "HPC_Opt.hpp"
 
 int main(){
@@ -15,10 +21,10 @@ int main(){
 
   const int d = {2};
   Eggholder f(d);
-  
+
   // Use the gradient descent algorithm to calculate the minimum.
   GradientDescent gd;
   Eigen::VectorXd res = gd.parallel_minimise(f, settings);
-  
+
   return 0;
 }
