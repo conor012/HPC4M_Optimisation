@@ -23,7 +23,8 @@ struct OptimiserSettings
   double max_bound {INFINITY};
   double min_bound {-INFINITY};
   double par_momentum;
-  double par_ada_norm_term;
+  int num_particles {10};
+  int dim;
   friend std::ostream& operator<<(std::ostream& os, const OptimiserSettings& settings);
 };
 

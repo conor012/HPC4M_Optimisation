@@ -11,7 +11,7 @@ int main(){
   settings.max_bound = 512;
   settings.method = 2;
   settings.par_momentum = 0.1;
-  settings.num_particles = 1000;
+  settings.num_particles = 50; // number of particles per process
 
   const int d = {2};
   Eggholder f(d);
