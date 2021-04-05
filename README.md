@@ -6,7 +6,7 @@ Aim: Implement algorithms to find the global minima of the Eggholder function an
 
 ## Getting Started
 
-These implementations use [Eigen 3.3.9](https://eigen.tuxfamily.org/index.php?title=Main_Page) for its linear algebra. I place Eigen in the root directory – it is ignored on pushing (See `.gitignore`). Then to compile the file `gd.cpp` with Eigen using g++ on Windows,
+These implementations use [Eigen 3.3.9](https://eigen.tuxfamily.org/index.php?title=Main_Page) for its linear algebra. I place Eigen in the root directory – it is ignored on pushing (See `.gitignore`). Then to compile the file `test/testGD.cpp` with Eigen using g++ on Windows,
 
 ```
 g++ -I .\eigen-3.3.9 test/testGD.cpp -o gd.exe
