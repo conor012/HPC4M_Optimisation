@@ -7,7 +7,7 @@
 // Use template to allow any type to be passed to gd
 template<typename ObjFunc> // Paramter 'max_bound' to define edge of a hypercube - optional
 Eigen::VectorXd gd(ObjFunc f, const int max_iter, int num_particles, int dim, double rel_sol_change_tol,
-                double grad_tol, double gam, const double max_bound = DBL_MAX){
+                double grad_tol, double gam, const double min_bound = -DBL_MAX, const double max_bound = DBL_MAX){
     // Learning rate is fixed value at the moment. Could change this?
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -16,9 +16,12 @@ Eigen::VectorXd gd(ObjFunc f, const int max_iter, int num_particles, int dim, do
     // .. n particles to be returned.
     Eigen::VectorXd step [num_particles], step_prev [num_particles], df[num_particles], step_lowest(dim);
 
-    // Randomly set initial point for each particle
+    // Randomise initial points
     for (int n = 0; n < num_particles; ++n){
-    step_prev[n] = max_bound * Eigen::VectorXd::Random(dim);
+        step_prev[n] = max_bound*Eigen::VectorXd::Random(dim);
+        for (int i=0; i<dim; ++i){
+            if (step_prev[n](i) < min_bound){ step_prev[n](i) = -step_prev[n](i);}
+        }
     }
 
 
@@ -40,7 +43,8 @@ Eigen::VectorXd gd(ObjFunc f, const int max_iter, int num_particles, int dim, do
 
          // Project iteration back into hypercube if needed
         for (int i=0; i<dim; ++i){
-            if (step[n](i) < -max_bound){step[n](i) = -max_bound;}
+            //if (step(i) < 0){step(i) = 0;}
+            if (step[n](i) < min_bound){step[n](i) = min_bound;}
             else if (step[n](i)>max_bound){step[n](i) = max_bound;}
         }
 
@@ -85,7 +89,7 @@ int main()
     int n_iter = 100000; // Set the maximum number of iterations
     double grad_tol = pow(10,-10); // Set the tolerance for norm gradient
     double rel_sol_change_tol = pow(10,-10); // Set the tolerance for change of solution
-    double max_bound = 512; // domain boundaries
+    double max_bound = 512; double min_bound = -512; // domain boundaries
 
     int  num_particles = 200; // number of particles in each process
 
@@ -100,7 +104,7 @@ int main()
     srand(seed);
 
     // Use the gradient descent algorithm to calculate the minimum (comment max_bound if not needed).
-    min_val = gd(f,n_iter, num_particles, d, grad_tol, rel_sol_change_tol, gam, max_bound);
+    min_val = gd(f,n_iter, num_particles, d, grad_tol, rel_sol_change_tol, gam, min_bound, max_bound);
 
     // All processors except the root send the min_val they have found to the root
     if(rank!=root){
