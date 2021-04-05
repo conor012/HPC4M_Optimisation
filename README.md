@@ -132,3 +132,7 @@ Algorithms:
 - [x] Particle Swarm -- better to hunt as a swarm or packs (i.e. local or global interaction)?
 - [ ] Ant/Bee Colony
 - [ ] Genetic/Evolutionary Algorithms
+
+-----
+
+This work used the [Cirrus UK National Tier-2 HPC Service at EPCC](http://www.cirrus.ac.uk) funded by the University of Edinburgh and EPSRC (EP/P020267/1). TH was supported by The Maxwell Institute Graduate School in Analysis and its Applications, a Centre for Doctoral Training funded by the UK Engineering and Physical Sciences Research Council (grant EP/L016508/01), the Scottish Funding Council, Heriot-Watt University and the University of Edinburgh. JS and CO were supported by The Maxwell Institute Graduate School in Mathematical Modelling, Analysis and Computation, a Centre for Doctoral Training funded by the UK Engineering and Physical Sciences Research Council (grant EP/S023291/1), the Scottish Funding Council, Heriot-Watt University and the University of Edinburgh.
