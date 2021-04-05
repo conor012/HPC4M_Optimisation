@@ -1,3 +1,7 @@
+/* MISC.HPP
+Implementation of BaseOptimiser, Result and OptimiserSettings classes to be inherited by
+all optimisers.
+*/
 #ifndef MISC
 #define MISC
 
@@ -24,6 +28,7 @@ struct OptimiserSettings
   double min_bound {-INFINITY};
   double par_momentum;
   double par_ada_norm_term;
+  int dim;
   friend std::ostream& operator<<(std::ostream& os, const OptimiserSettings& settings);
 };
 

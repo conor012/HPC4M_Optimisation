@@ -1,3 +1,14 @@
+/* BFGS.HPP
+Implementation of Broyden-Fletcher-Goldfarb-Shanno algorithms using an adaptive step size
+set by the Armijo condition.
+
+Should only be included indirectly through HPC_Opt.hpp.
+
+For example usage see test/testBFGS.cpp
+See also:
+  - misc.hpp for implementation of base classes.
+  - test/testParPSO.cpp for a swarm algo with BFGS final stage
+*/
 #ifndef BFGS_OP
 #define BFGS_OP
 

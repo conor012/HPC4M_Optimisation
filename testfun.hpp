@@ -1,9 +1,7 @@
-#include <iostream>
-#include <cmath>
-#include <Eigen/Dense>
-#include <chrono>
-#include <thread>
-
+/* TESTFUN.HPP
+Optimisation test functions including base ObjectiveFunction.
+If gradient is not given analytically, it will be calculated by a centred finite difference.
+*/
 #ifndef TESTFUN
 #define TESTFUN
 
