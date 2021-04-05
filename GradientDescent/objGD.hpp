@@ -85,22 +85,30 @@ public:
     const int d = 2;
     // Initialise vectors to hold the minimum value to be found and the intial values (which need to be inputed)
     Eigen::VectorXd min_val(d);
-    Eigen::VectorXd int_val(d);
+    Eigen::VectorXd int_val[settings.num_particles];
     // Set intial values. At the moment this selects them randomly but that could be changed.
     // Seed the time differently for each process
     unsigned seed = time(0) + rank;
     // Seed the random number generator.
     srand(seed);
-    // Fill intial values with random integers in domain
-    int_val = settings.max_bound * Eigen::VectorXd::Random(d);
-
-    // Use the gradient descent algorithm to calculate the minimum (comment max_bound if not needed).
+    // Randomise initial points
     GradientDescent gd;
-    Result res = gd.minimise(f, int_val, settings);
-
+    Result res;
+    for (int n = 0; n < settings.num_particles; ++n){
+        int_val[n] = settings.max_bound*Eigen::VectorXd::Random(d);
+        for (int i=0; i<d; ++i){
+            if (int_val[n](i) < settings.min_bound){ int_val[n](i) = -int_val[n](i);}
+        }
+      // Use the gradient descent algorithm to calculate the minimum for each particle
+      res = gd.minimise(f, int_val[n], settings);
+      // Update each time to find minimum of these particles.
+      if(res.minimum < f.evaluate(min_val)){
+          min_val = res.minimiser;  
+      }
+    }
     // All processors except the root send the min_val they have found to the root
     if(rank!=root){
-        MPI_Send(&res.minimiser[0], d, MPI_DOUBLE, 0, 1, comm);
+        MPI_Send(&min_val, d, MPI_DOUBLE, 0, 1, comm);
     }
 
     if(rank == root)
