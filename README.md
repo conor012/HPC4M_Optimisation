@@ -134,4 +134,4 @@ Algorithms:
 
 -----
 
-This work used the Cirrus UK National Tier-2 HPC Service at EPCC (\url{http://www.cirrus.ac.uk}) funded by the University of Edinburgh and EPSRC (EP/P020267/1). TH was supported by The Maxwell Institute Graduate School in Analysis and its Applications, a Centre for Doctoral Training funded by the UK Engineering and Physical Sciences Research Council (grant EP/L016508/01), the Scottish Funding Council, Heriot-Watt University and the University of Edinburgh.
+This work used the [Cirrus UK National Tier-2 HPC Service at EPCC](http://www.cirrus.ac.uk) funded by the University of Edinburgh and EPSRC (EP/P020267/1). TH was supported by The Maxwell Institute Graduate School in Analysis and its Applications, a Centre for Doctoral Training funded by the UK Engineering and Physical Sciences Research Council (grant EP/L016508/01), the Scottish Funding Council, Heriot-Watt University and the University of Edinburgh.
