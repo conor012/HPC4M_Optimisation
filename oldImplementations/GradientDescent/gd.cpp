@@ -1,4 +1,4 @@
-#include "..\testfun.hpp"
+#include "../testfun.hpp"
 #include<iostream>
 #include<Eigen/Dense>
 
@@ -12,13 +12,9 @@ Eigen::VectorXd gd(ObjectiveFunction& f, const int max_iter, const Eigen::Vector
     Eigen::VectorXd step_prev = int_val;
     std::cout<<step_prev<<std::endl;
 
-    //  Init df and df_prev which are \nabla F(x_i) and \nabla F(x_{i-1}) respectively.
+    //  Init df which is \nabla F(x_i).
     const int dim = int_val.size();
-    Eigen::VectorXd df_prev(dim);
     Eigen::VectorXd df(dim);
-
-    // We need to fill df_prev for the algorithm to work. Set every element equal to 100 (any big number will do)..
-    df_prev.fill(100);
 
     // ... the same with the relative change in the solution and the change in the gradient...
     // ... for x_{i-1} to x_i
@@ -30,7 +26,7 @@ Eigen::VectorXd gd(ObjectiveFunction& f, const int max_iter, const Eigen::Vector
     // Whilst the max number of iterations has not been reached, the relative change in the solutions and ...
     // ... the change in the gradient are both less than the prescribed tol we look...
     // ... hopefully getting closer and closer to the true minimiser.
-    while(iter < max_iter && rel_sol_change > rel_sol_change_tol && grad_change > grad_change_tol){
+    while(iter < max_iter && rel_sol_change > rel_sol_change_tol && grad_change > grad_tol){
         df = f.gradient(step_prev);                                                     // Calculate \nabla F(x_{i-1})...
         step = step_prev - gam*df;
         rel_sol_change = abs(f.evaluate(step_prev) - f.evaluate(step)/f.evaluate(step));    // The relative change in solution x_i and x_{i-1}
@@ -39,7 +35,6 @@ Eigen::VectorXd gd(ObjectiveFunction& f, const int max_iter, const Eigen::Vector
         // Then update the steps (x_i's) and gradients (df's) for the next iteration.
         // std::cout<< " Current Step is :" << step << std::endl;
         step_prev = step;
-        df_prev = df;
         iter++;
     }
     std::cout << "\nFound minimum in " << iter << " steps" << std::endl;
@@ -60,11 +55,11 @@ int main()
     // Set intial values. This could be anything.
     int_vals.fill(3);
     // Use the gradient descent algorithm to calculate the minimum.
-    min_val = gd(f,n_iter, int_vals, grad_change_tol, rel_sol_change_tol, gam);
+    min_val = gd(f,n_iter, int_vals, grad_tol, rel_sol_change_tol, gam);
 
     std::cout << "\nAfter " << n_iter <<
-     " iterations and with a change in gradient tolerance of " <<
-     grad_change_tol << "\nand a change in relative solution tolerance of " <<
+     " iterations and with a gradient tolerance of " <<
+     grad_tol << "\nand a change in relative solution tolerance of " <<
      rel_sol_change_tol << "\nthe minimiser is:\n" << min_val;
 
     std::cout << "\nThe objective value at this point is " <<
